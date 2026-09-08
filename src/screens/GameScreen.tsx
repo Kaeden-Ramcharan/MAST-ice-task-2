@@ -1,0 +1,139 @@
+import { useState } from 'react';
+import { View, Text, TouchableHighlight } from 'react-native';
+import { globalStyles } from '../styles/globalStyles';
+
+interface GameScreenProps {
+  navigation: any;
+  route: any;
+}
+
+export default function GameScreen({ navigation, route }: GameScreenProps) {
+  const { player1, player2 } = route.params;
+  const [player1Turn, setPlayer1Turn] = useState<boolean>(true);
+
+  // Each block holds one of three values: 0 - Not played yet | 1 - Player1 played | 2 - Player2 played
+  const [block1, setBlock1] = useState<number>(0);
+  const [block2, setBlock2] = useState<number>(0);
+  const [block3, setBlock3] = useState<number>(0);
+  const [block4, setBlock4] = useState<number>(0);
+  const [block5, setBlock5] = useState<number>(0);
+  const [block6, setBlock6] = useState<number>(0);
+  const [block7, setBlock7] = useState<number>(0);
+  const [block8, setBlock8] = useState<number>(0);
+  const [block9, setBlock9] = useState<number>(0);
+
+  // Display X or O
+  const contentFor = (block: number): string => {
+    switch (block) {
+      case 1:
+        return 'X';
+      case 2:
+        return 'O';
+      default:
+        return '';
+    }
+  };
+
+  // Checks all 8 possible winning lines: 3 rows, 3 columns, 2 diagonals
+  let winner: number = 0;
+  if (block1 > 0 && block1 === block2 && block2 === block3) winner = block1;
+  if (block4 > 0 && block4 === block5 && block5 === block6) winner = block4;
+  if (block7 > 0 && block7 === block8 && block8 === block9) winner = block7;
+  if (block1 > 0 && block1 === block4 && block4 === block7) winner = block1;
+  if (block2 > 0 && block2 === block5 && block5 === block8) winner = block2;
+  if (block3 > 0 && block3 === block6 && block6 === block9) winner = block3;
+  if (block1 > 0 && block1 === block5 && block5 === block9) winner = block1;
+  if (block3 > 0 && block3 === block5 && block5 === block7) winner = block3;
+
+  // handlePress is shared by all nine tiles. | block: the tile's current value (0, 1, or 2)
+
+  const handlePress = (block: number, setBlock: (value: number) => void) => {
+    if (winner !== 0) return; // stop game after winner is chosen
+
+    if (block !== 0) {
+      return; // tile already played
+    }
+
+    // set the block based on who played it
+    player1Turn ? setBlock(1) : setBlock(2);
+
+    setPlayer1Turn(!player1Turn);
+  };
+
+  return (
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>{player1} vs. {player2}</Text>
+
+      <Text>
+        {player1Turn ? `${player1}'s Turn` : `${player2}'s Turn`}
+      </Text>
+
+      {/* Board layout: 3 rows of 3 cells */}
+      <View>
+        <View style={globalStyles.row}>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block1, setBlock1)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block1)}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block2, setBlock2)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block2)}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block3, setBlock3)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block3)}</Text>
+          </TouchableHighlight>
+        </View>
+        <View style={globalStyles.row}>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block4, setBlock4)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block4)}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block5, setBlock5)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block5)}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block6, setBlock6)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block6)}</Text>
+          </TouchableHighlight>
+        </View>
+        <View style={globalStyles.row}>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block7, setBlock7)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block7)}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block8, setBlock8)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block8)}</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={globalStyles.cell}
+            onPress={() => handlePress(block9, setBlock9)}
+          >
+            <Text style={globalStyles.cellText}>{contentFor(block9)}</Text>
+          </TouchableHighlight>
+        </View>
+      </View>
+
+      {winner === 1 && <Text style={globalStyles.title}>{player1} Wins!</Text>}
+      {winner === 2 && <Text style={globalStyles.title}>{player2} Wins!</Text>}
+    </View>
+  );
+}
